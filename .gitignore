@@ -1,8 +1,21 @@
-__pycache__/
+# This script creates a .gitignore file for color-guess-game.py
+def create_gitignore():
+    content = """__pycache__/
 *.pyc
 .env
-node_modules/
-dist/
 color-guess-game-binary/
+dist/
+*.log
+"""
+    try:
+        with open(".gitignore", "w") as f:
+            f.write(content)
+        print(" .gitignore created successfully.")
+    except Exception as e:
+        print("Failed to create .gitignore:", e)
+
+if __name__ == "__main__":
+    create_gitignore()
+
 
 
