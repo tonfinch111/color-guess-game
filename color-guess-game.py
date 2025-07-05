@@ -1,26 +1,25 @@
 import random
 
-def main():
-    colors = ["red", "blue", "green", "yellow", "purple", "orange"]
-    correct_color = random.choice(colors)
-    attempts = 0
+def get_random_color():
+    colors = ["red", "blue", "green", "yellow", "orange", "purple"]
+    return random.choice(colors)
 
+def play_game():
     print("Welcome to the Color Guessing Game!")
-    print("Try to guess the correct color from this list:")
-    print(", ".join(colors))
+    secret_color = get_random_color()
+    attempts = 3
 
-    while True:
-        guess = input("Enter your guess: ").strip().lower()
-        attempts += 1
-
-        if guess == correct_color:
-            print(f"Correct! You guessed it in {attempts} attempts.")
+    while attempts > 0:
+        guess = input(f"Guess the color ({attempts} attempts left): ").lower()
+        if guess == secret_color:
+            print("Congratulations! You guessed it right!")
             break
-        elif guess in colors:
-            print("Incorrect. Try again!")
         else:
-            print("Invalid color. Try one of:", ", ".join(colors))
+            print("Wrong guess. Try again.")
+            attempts -= 1
+
+    if attempts == 0:
+        print(f"Game over! The correct color was '{secret_color}'.")
 
 if __name__ == "__main__":
-    main()
-
+    play_game()
