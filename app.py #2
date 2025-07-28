@@ -1,0 +1,66 @@
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import json
+import random
+
+colors = ["red", "green", "blue", "yellow", "purple", "orange"]
+game_data = {
+    "target_color": None,
+    "guesses": []
+}
+
+class SimpleColorGameAPI(BaseHTTPRequestHandler):
+
+    def _set_headers(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+
+    def do_POST(self):
+        if self.path == "/start":
+            game_data["target_color"] = random.choice(colors)
+            game_data["guesses"] = []
+            self._set_headers()
+            self.wfile.write(json.dumps({"message": "Game started!"}).encode())
+
+        elif self.path == "/guess":
+            content_length = int(self.headers['Content-Length'])
+            body = self.rfile.read(content_length)
+            data = json.loads(body)
+
+            guess = data.get("guess", "").lower()
+            game_data["guesses"].append(guess)
+
+            response = {
+                "correct": guess == game_data["target_color"],
+                "guess": guess,
+                "target_color": game_data["target_color"] if guess == game_data["target_color"] else None
+            }
+
+            self._set_headers()
+            self.wfile.write(json.dumps(response).encode())
+
+        elif self.path == "/reset":
+            game_data["target_color"] = None
+            game_data["guesses"] = []
+            self._set_headers()
+            self.wfile.write(json.dumps({"message": "Game reset."}).encode())
+
+    def do_GET(self):
+        if self.path == "/status":
+            self._set_headers()
+            self.wfile.write(json.dumps({
+                "target_color": game_data["target_color"] if game_data["target_color"] else "Not started",
+                "guesses": game_data["guesses"]
+            }).encode())
+
+def run(server_class=HTTPServer, handler_class=SimpleColorGameAPI, port=8080):
+    server_address = ('', port)
+    httpd = server_class(server_address, handler_class)
+    print(f"🎯 Color Guess Game API running at http://localhost:{port}")
+    httpd.serve_forever()
+
+if __name__ == "__main__":
+    run()
+
+
+
